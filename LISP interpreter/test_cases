@@ -1,0 +1,127 @@
+IMPORTANT : Note that we put spaces before and after all parentheses and atoms. This simplifies parsing.
+
+# testing simple arithmetic expressions
+
+( + 2 3 )
+
+# Output : 5
+
+( + 2 ( + 4 5 ) )
+
+# Output : 11
+
+( define x 3 )
+
+# Output 3
+
+( define x ( + 2 3 ) )
+
+# Output 5
+
+( begin ( define x 3 ) ( + x 7 ) )
+
+# Output 10
+
+# testing if expressions
+
+( if ( <= 3 2 ) 5 6 )
+
+# Output : 6
+
+( if ( <= 2 3 ) 5 6 )
+
+# Output : 5
+
+# testing simple non-recursive functions
+
+# 1. Function to computer x+x
+
+( begin ( define f ( lambda ( x ) ( + x x ) ) ) ( f 3 ) )
+
+Output : 6
+
+# 2. Function to compute the area of a circle
+
+( begin ( define a ( lambda ( r ) ( * 3.1415 ( * r r ) ) ) ) ( a 5 ) )
+
+Output : 78.5375
+
+# testing the simplest recursive function : factorial (n)
+
+( begin ( define f ( lambda ( n ) ( if ( <= n 1 ) 1 ( * n ( f ( - n 1 ) ) ) ) ) ) ( f 5 ) )
+
+# Output : 120
+
+# testing non-recursive two-argument functions
+
+( ( lambda ( x y ) ( * x y ) ) 6 3 )
+
+# Output : 18
+
+# testing binary recursion - calculating fibonacci numbers
+
+( begin ( define f ( lambda ( n ) ( if ( == n 0 ) 0 ( if ( == n 1 ) 1 ( + ( f ( - n 1 ) ) ( f ( - n 2 ) ) ) ) ) ) ) ( f 13 ) )
+
+# Output : 233
+
+# testing giving functions as arguments to functions (or, in other words, function pointers! )
+
+( begin ( define s ( lambda ( x ) ( * x x ) ) ) ( define f ( lambda ( g x ) ( g ( g x ) ) ) ) ( f s 5 ) )
+
+# Output : 625
+
+# raise a to the power b
+
+# computing a^b in b multiplications
+
+( begin ( define e ( lambda ( a b ) ( if ( == b 0 ) 1 ( * a ( e a ( - b 1 ) ) ) ) ) ) ( e 5 3 ) )
+
+# Output : 525
+
+# computing a^b  in log b multiplications
+
+( begin ( define e ( lambda ( a b ) ( if ( == b 0 ) 1 ( if ( == ( % b 2 ) 0 ) ( ( lambda ( x ) ( * x x ) ) ( e a ( / b 2 ) ) ) ( * a ( e a ( - b 1 ) ) ) ) ) ) ) ( e 2 10 ) )
+
+# Output : 1024
+
+# b1. in log b multiplications with recursive begin
+
+( begin ( define e ( lambda ( a b ) ( if ( == b 0 ) 1 ( if ( == ( % b 2 ) 0 ) ( begin ( define x ( e a ( / b 2 ) ) ) ( * x x ) ) ( * a ( e a ( - b 1 ) ) ) ) ) ) ) ( e 2 10 ) )
+
+# Newton's method to solve equations
+# a = abs, f = f, d = f_prime, x = old value, e = new value
+# f = (x^2 - 2), d = 2*x, initial value =  1, tolerance = 0.0001
+
+( begin ( define a ( lambda ( x ) ( if ( < x 0 ) ( * ( - 0 1 ) x ) x ) ) ) ( define f ( lambda ( x ) ( - ( * x x ) 2 ) ) ) ( define d ( lambda ( x ) ( * 2 x ) ) ) ( define n ( lambda ( x ) ( begin ( define e ( - x ( / ( f x ) ( d x ) ) ) ) ( if ( < ( a ( - x e ) ) 0.0001 ) e ( n e ) ) ) ) ) ( n 1 ) )  
+
+Output : 1.41421
+
+# Newton's method for cube root of 10
+
+( begin ( define a ( lambda ( x ) ( if ( < x 0 ) ( * ( - 0 1 ) x ) x ) ) ) ( define f ( lambda ( x ) ( - ( * x ( * x x ) ) 10 ) ) ) ( define d ( lambda ( x ) ( * 3 ( * x x ) ) ) ) ( define n ( lambda ( x ) ( begin ( define e ( - x ( / ( f x ) ( d x ) ) ) ) ( if ( < ( a ( - x e ) ) 0.0001 ) e ( n e ) ) ) ) ) ( n 1 ) ) 
+
+# Output : 2.15443
+
+# Recursive evaluation of sin (x)
+ 
+( begin ( define c ( lambda ( x ) ( * x ( * x x ) ) ) ) ( define s ( lambda ( x ) ( begin ( define y ( / x 3 ) ) ( if ( <= x 0.0001 ) x ( - ( * 3 ( s y ) ) ( * 4 ( c ( s y ) ) ) ) ) ) ) ) ( s 10 ) )
+
+Output : -0.544022
+
+# Nested function definitions
+( ( lambda ( x ) ( ( lambda ( y ) ( + 3 y ) ) x ) ) 5 ) 
+
+Output : 8
+
+# testing while loop. computing 1+2+...+10
+
+( begin ( define i 1 ) ( define sum 0 ) ( while ( <= i 10 ) ( begin ( set sum ( + sum i ) ) ( set i ( + i 1 ) ) ) ) sum )
+
+Output : 55
+
+# computes the n-th fibonacci number using while loop
+( begin ( define i 1 ) ( define n 10 ) ( define a 0 ) ( define b 1 ) ( while ( <= i n ) ( begin ( define t ( + a b ) ) ( set a b ) ( set b t ) ( set i ( + i 1 ) ) ) ) a ) 
+
+Output : 55 
+
+
